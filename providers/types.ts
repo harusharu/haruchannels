@@ -1,5 +1,5 @@
-import { AxiosStatic } from "axios";
-import * as cheerio from "cheerio";
+import type { AxiosStatic } from "axios";
+import type * as cheerio from "cheerio";
 
 // Content type for providers (replaces zustand import)
 export interface Content {

@@ -1,4 +1,5 @@
 import { Stream, ProviderContext, SkipInterval } from "../types";
+import { getBaseUrl } from "../getBaseUrl";
 import { throwProviderError } from "../providerErrors";
 import { fetchTheIntroDbSkipTimings } from "../theintrodb";
 
@@ -95,6 +96,11 @@ export const getStream = async ({
 
     const kv = providerContext.kvStore;
     let baseUrl = "https://torrentio.strem.fun";
+    try {
+      baseUrl = (await getBaseUrl("torrentio")) || baseUrl;
+    } catch {
+      // standalone offline — keep default
+    }
     let debridService = "none";
     let debridApiKey = "";
     let qualityFilter = "all";

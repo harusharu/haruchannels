@@ -1,7 +1,16 @@
 import { EpisodeLink, Info, Link, ProviderContext } from "../types";
+import { getBaseUrl } from "../getBaseUrl";
 import { throwProviderError } from "../providerErrors";
 
-const BASE_URL = "https://anikototv.to";
+const FALLBACK_BASE_URL = "https://anikototv.to";
+
+async function resolveBaseUrl(): Promise<string> {
+  try {
+    return (await getBaseUrl("anikoto")) || FALLBACK_BASE_URL;
+  } catch {
+    return FALLBACK_BASE_URL;
+  }
+}
 
 function rc4(key: string, input: string): string {
   const s = Array.from({ length: 256 }, (_, i) => i);
@@ -59,6 +68,7 @@ export const getMeta = async function ({
 }): Promise<Info> {
   try {
     const { axios, cheerio } = providerContext;
+    const BASE_URL = await resolveBaseUrl();
 
     let watchUrl = link;
     if (!watchUrl.startsWith("http")) {

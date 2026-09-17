@@ -1,7 +1,16 @@
 import { ProviderContext, SkipInterval, Stream, TextTracks } from "../types";
+import { getBaseUrl } from "../getBaseUrl";
 import { throwProviderError } from "../providerErrors";
 
-const BASE_URL = "https://anikototv.to";
+const FALLBACK_BASE_URL = "https://anikototv.to";
+
+async function resolveBaseUrl(): Promise<string> {
+  try {
+    return (await getBaseUrl("anikoto")) || FALLBACK_BASE_URL;
+  } catch {
+    return FALLBACK_BASE_URL;
+  }
+}
 
 const defaultHeaders = {
   "User-Agent":
@@ -105,6 +114,7 @@ export const getStream = async function ({
 }): Promise<Stream[]> {
   try {
     const { axios, cheerio } = providerContext;
+    const BASE_URL = await resolveBaseUrl();
     const payload = (() => {
       try {
         return JSON.parse(link);

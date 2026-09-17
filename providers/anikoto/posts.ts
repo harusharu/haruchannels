@@ -1,6 +1,15 @@
 import { Post, ProviderContext } from "../types";
+import { getBaseUrl } from "../getBaseUrl";
 
-const BASE_URL = "https://anikototv.to";
+const FALLBACK_BASE_URL = "https://anikototv.to";
+
+async function resolveBaseUrl(): Promise<string> {
+  try {
+    return (await getBaseUrl("anikoto")) || FALLBACK_BASE_URL;
+  } catch {
+    return FALLBACK_BASE_URL;
+  }
+}
 
 export const getPosts = async function ({
   filter,
@@ -16,6 +25,7 @@ export const getPosts = async function ({
 }): Promise<Post[]> {
   try {
     const { axios, cheerio } = providerContext;
+    const BASE_URL = await resolveBaseUrl();
     const delimiter = filter.includes("?") ? "&" : "?";
     const url = `${BASE_URL}${filter}${delimiter}page=${page}`;
 
@@ -79,6 +89,7 @@ export const getSearchPosts = async function ({
 }): Promise<Post[]> {
   try {
     const { axios, cheerio } = providerContext;
+    const BASE_URL = await resolveBaseUrl();
     const url = `${BASE_URL}/filter?keyword=${encodeURIComponent(
       searchQuery
     )}&page=${page}`;

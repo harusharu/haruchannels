@@ -224,7 +224,7 @@ export async function extractCinejoyStreams({
 
         if (resData?.stream && Array.isArray(resData.stream)) {
           for (const item of resData.stream) {
-            const subtitles: TextTracks[] = (item.captions || []).map(
+            const subtitles = (item.captions || []).map(
               (c: any) => ({
                 title: c.id || c.language || "Subtitle",
                 file: c.url,
@@ -238,7 +238,7 @@ export async function extractCinejoyStreams({
                 link: item.playlist,
                 type: "m3u8",
                 quality: srv["4k"] ? "2160" : "1080",
-                subtitles: subtitles.length ? subtitles : undefined,
+                subtitles: (subtitles.length ? subtitles : undefined) as Stream['subtitles'],
                 headers: {
                   Referer: "https://cinejoy.to/",
                   Origin: "https://cinejoy.to",
@@ -256,7 +256,7 @@ export async function extractCinejoyStreams({
                       : qKey.includes("720")
                       ? "720"
                       : undefined,
-                    subtitles: subtitles.length ? subtitles : undefined,
+                    subtitles: (subtitles.length ? subtitles : undefined) as Stream['subtitles'],
                     headers: {
                       Referer: "https://cinejoy.to/",
                       Origin: "https://cinejoy.to",

@@ -14,6 +14,18 @@ type ProviderState = {
   __vegaProviderBaseUrlCache__?: BaseUrlCache;
 };
 
+// Host-app overrides (e.g. harustream seeds these from its urls.ts so both
+// repos resolve identical base URLs without a network round-trip).
+const baseUrlOverrides = new Map<string, string>();
+
+export function setBaseUrlOverride(providerValue: string, url: string): void {
+  baseUrlOverrides.set(providerValue, url.replace(/\/+$/, ""));
+}
+
+export function setBaseUrlOverrides(entries: Record<string, string>): void {
+  for (const [key, url] of Object.entries(entries)) setBaseUrlOverride(key, url);
+}
+
 declare const providerGlobal: ProviderState | undefined;
 
 function getCache(): BaseUrlCache {
@@ -71,6 +83,8 @@ async function fetchProviderUrls(): Promise<ProviderUrls> {
 }
 
 export const getBaseUrl = async (providerValue: string) => {
+  const override = baseUrlOverrides.get(providerValue);
+  if (override) return override;
   try {
     const providerUrls = await fetchProviderUrls();
     return providerUrls[providerValue]?.url ?? "";
